@@ -3,7 +3,7 @@ const path = require('path');
 
 module.exports = {
     entry: {
-        bday: './src/index.jsx',
+        maze: './src/index.jsx',
     },
     resolve: {
         extensions: ['.js', '.jsx'],
