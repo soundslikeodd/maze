@@ -1,0 +1,26 @@
+#controls {
+  margin: 5px;
+  border: 1px #009 solid;
+  border-radius: 5px;
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  .radio-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+  }
+
+  button {
+    border: 1px gray solid;
+    background-color: black;
+    color: #f8f8ff;
+    border-radius: 5px;
+  }
+
+  .current-settings {
+    font-size: 8px;
+  }
+}

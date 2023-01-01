@@ -1,0 +1,12 @@
+#maze {
+  width: 240px;
+  background-color: red;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  div {
+    box-sizing: border-box;
+    flex: 1 1 24px;
+  }
+}

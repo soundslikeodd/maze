@@ -1,0 +1,164 @@
+$wall-width: 1px;
+$wall-color: black;
+$wall-style: solid $wall-width $wall-color;
+$start-color: #128717;
+$end-color: #871282;
+$line-color: #871247;
+
+.cell {
+  background-color: white;
+  width: 24px;
+  height: 24px;
+  padding: 0px;
+  margin: 0px;
+  font-size: 9px;
+  display: flex;
+  justify-content: center;
+
+  &.wall-north {
+    border-top: $wall-style;
+  }
+
+  &.visited {
+    align-self: center;
+    font-size: 18px;
+    color: $line-color;
+
+    &:not(.wall-north) {
+      &::after {
+        content: '┃';
+      }
+
+      &:not(.wall-south) {
+        &::after {
+          content: '┃';
+        }
+
+        &:not(.wall-east) {
+          &::after {
+            content: '┣';
+          }
+
+          &:not(.wall-west) {
+            &::after {
+              content: '╋';
+            }
+          }
+        }
+
+        &:not(.wall-west) {
+          &::after {
+            content: '┫';
+          }
+        }
+      }
+
+      &:not(.wall-east) {
+        &::after {
+          content: '┗';
+        }
+
+        &:not(.wall-west) {
+          &::after {
+            content: '┻';
+          }
+        }
+      }
+
+      &:not(.wall-west) {
+        &::after {
+          content: '┛';
+        }
+      }
+    }
+
+    &:not(.wall-south) {
+      &::after {
+        content: '┃';
+      }
+
+      &:not(.wall-east) {
+        &::after {
+          content: '┏';
+        }
+
+        &:not(.wall-west) {
+          &::after {
+            content: '┳';
+          }
+        }
+      }
+
+      &:not(.wall-west) {
+        &::after {
+          content: '┓';
+        }
+      }
+    }
+
+    &:not(.wall-east) {
+      &::after {
+        content: '━';
+      }
+
+      &:not(.wall-west) {
+        &::after {
+          content: '━';
+        }
+      }
+    }
+
+    &:not(.wall-west) {
+      &::after {
+        content: '━';
+      }
+    }
+  }
+
+  &.wall-east {
+    border-right: $wall-style;
+  }
+
+  &.wall-south {
+    border-bottom: $wall-style;
+  }
+
+  &.wall-west {
+    border-left: $wall-style;
+  }
+
+  &.start {
+    color: $start-color;
+    font-size: 20px;
+
+    &.visited {
+      color: $start-color;
+      &::after {
+        font-size: 20px;
+        content: 'S';
+      }
+    }
+  }
+
+  &.current {
+    background-color: aqua;
+  }
+
+  &.end {
+    color: $end-color;
+    font-size: 20px;
+
+    &::after {
+      font-size: 20px;
+      content: 'F';
+    }
+
+    &.visited {
+      &::after {
+        color: $end-color;
+        font-size: 20px;
+        content: 'F';
+      }
+    }
+  }
+}
