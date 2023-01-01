@@ -1,26 +1,49 @@
 #controls {
   margin: 5px;
-  border: 1px #009 solid;
+  border: 1px black solid;
   border-radius: 5px;
   font-size: 11px;
   display: flex;
   flex-direction: column;
   gap: 5px;
 
-  .radio-container {
+  .controls-row {
     display: flex;
     flex-direction: row;
-    align-items: flex-end;
+    gap: 5px;
+    justify-content: space-between;
+  }
+
+  .controls-col {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 100%;
+  }
+
+  .checkbox-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
   }
 
   button {
-    border: 1px gray solid;
-    background-color: black;
-    color: #f8f8ff;
+    flex: 1;
+    border: 2px black solid;
+    background-color: #EDF5B3;
+    color: black;
     border-radius: 5px;
   }
 
   .current-settings {
     font-size: 8px;
+  }
+
+  .buttons-container {
+    height: 100%;
+  }
+
+  .instructions {
+    font-size: 8px
   }
 }

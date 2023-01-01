@@ -10,7 +10,7 @@ const Status = ({
         <div 
             id="winning"
         >
-            {win && 'You Won!'}
+            {win && 'You Won'}
         </div>
         <div>
             {win && 'in'}

@@ -188,11 +188,31 @@ const MazeContainer = ({}) => {
                     const current = maze.reduce((item, row) => {
                         const found = row.find(c => c.start);
                         return found || item;
-                    }, {})
+                    }, {});
                     const end = maze.reduce((item, row) => {
                         const found = row.find(c => c.end);
                         return found || item;
-                    }, {})
+                    }, {});
+                    setProgress(
+                        {
+                            current,
+                            visited: [current],
+                            win: false,
+                            end,
+                            maze,
+                        }
+                    );
+                }}
+                restartMaze={() => {
+                    const maze = game.maze;
+                    const current = maze.reduce((item, row) => {
+                        const found = row.find(c => c.start);
+                        return found || item;
+                    }, {});
+                    const end = maze.reduce((item, row) => {
+                        const found = row.find(c => c.end);
+                        return found || item;
+                    }, {});
                     setProgress(
                         {
                             current,

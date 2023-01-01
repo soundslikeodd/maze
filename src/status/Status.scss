@@ -1,9 +1,10 @@
 #game-status {
+  align-self: center;
   display: flex;
   flex-direction: row;
   gap: 5px;
 
   #winning {
-    background-color: aquamarine;
+    background-color: #B3CCF5;
   }
 }
