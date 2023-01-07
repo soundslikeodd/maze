@@ -1,13 +1,13 @@
+import { createBrowserHistory } from 'history';
 import {
     useState,
     useEffect
 } from 'react';
+import { v4 as uuid } from 'uuid';
 import Maze from './maze/Maze';
 import Controls from './controls/Controls';
 import Status from './status/Status';
 import {
-    generateEdges,
-    determineStartFinish,
     generateMaze,
     cellsEqual,
     defaultMazeHeight,
@@ -15,14 +15,66 @@ import {
 } from './generation/generator';
 import './MazeContainer.scss';
 
+const history = createBrowserHistory();
+const queryStringToObj = qStr => {
+    if (qStr.length < 1) return {};
+    const qSplit = qStr.includes('&') ? qStr.split('&') : [qStr];
+    return qSplit.reduce((acc, i) => ({ ...acc, [i.split('=')[0]]: i.split('=')[1] }), {});
+};
+const objToQueryString = props => Object.keys(props)
+    .reduce(
+        (acc, i) => `${acc.length < 1 ? '' : `${acc}&`}${i}=${props[i]}`,
+        ''
+    );
+const updateParams = paramMap => {
+    history.replace({
+        pathname: history.location.pathname,
+        search: objToQueryString(
+            {
+                ...queryStringToObj(history.location.search.replace('?', '')),
+                ...paramMap,
+            }
+        ),
+    });
+};
+
 const newMaze = (
     width,
     height,
-    ranSE
-) => generateMaze(determineStartFinish(generateEdges(width, height), ranSE));
-const initialMaze = newMaze(defaultMazeWidth, defaultMazeHeight);
+    ranSE,
+    seed
+) => generateMaze(seed, width, height, ranSE);
 
-const updateProgress = (current, visited, nextCellFunc, end, maze) => {
+/**
+ * initialConfig shape
+ * {
+ *  s: seed,
+ *  w: width,
+ *  h: height,
+ *  r: random start and finish points
+ * }
+ */
+const initialConfig = queryStringToObj(history.location.search.replace('?', ''));
+const initialSeed = initialConfig?.s || uuid();
+const validatedWidth = [10, 15].includes(+initialConfig?.w) ? +initialConfig.w : defaultMazeWidth;
+const validatedHeight = [10, 15].includes(+initialConfig?.h) ? +initialConfig.h : defaultMazeHeight;
+const initalRandomSF = initialConfig?.r === 'true' ? true : false;
+const initialMaze = newMaze(
+    validatedHeight, // explicitly set to height - maze is roteated
+    validatedWidth, // explicitly set to weight - maze is roteated
+    initalRandomSF,
+    initialSeed
+);
+updateParams(
+    {
+        s: initialSeed,
+        r: initalRandomSF,
+        w: validatedWidth,
+        h: validatedHeight,
+    }
+);
+
+const updateProgress = (current, visited, nextCellFunc, end, maze, seed) => {
     const nextCell = nextCellFunc(current);
     return {
         current: nextCell,
@@ -30,6 +82,7 @@ const updateProgress = (current, visited, nextCellFunc, end, maze) => {
         win: cellsEqual(nextCell, end),
         end,
         maze,
+        seed,
         touchStart: null,
     };
 };
@@ -58,6 +111,7 @@ const determineTouchDirection = (
 
 const MazeContainer = ({}) => {
     const [touchStart, setTouchStart] = useState();
+    const [userSeed, setUserSeed] = useState('');
     const [game, setProgress] = useState(() => {
         const current = initialMaze.reduce((item, row) => {
             const found = row.find(c => c.start);
@@ -73,7 +127,8 @@ const MazeContainer = ({}) => {
             win: false,
             end,
             maze: initialMaze,
-            touchStart: null,
+            seed: initialSeed,
+            touchStart: null
         };
     });
     useEffect(() => {
@@ -99,6 +154,7 @@ const MazeContainer = ({}) => {
                         end,
                         win,
                         maze,
+                        seed,
                     } = p;
                     return !win && !maze[current.x][current.y].wallNorth
                         ? updateProgress(
@@ -106,7 +162,8 @@ const MazeContainer = ({}) => {
                             visited,
                             c => ({x: c.x - 1, y: c.y}),
                             end,
-                            maze
+                            maze,
+                            seed,
                         )
                         : p;
                 });
@@ -118,6 +175,7 @@ const MazeContainer = ({}) => {
                         end,
                         win,
                         maze,
+                        seed,
                     } = p;
                     return !win && !maze[current.x][current.y].wallEast
                         ? updateProgress(
@@ -125,7 +183,8 @@ const MazeContainer = ({}) => {
                             visited,
                             c => ({x: c.x, y: c.y + 1}),
                             end,
-                            maze
+                            maze,
+                            seed,
                         )
                         : p;
                 });
@@ -137,6 +196,7 @@ const MazeContainer = ({}) => {
                         end,
                         win,
                         maze,
+                        seed,
                     } = p;
                     return !win && !maze[current.x][current.y].wallSouth
                         ? updateProgress(
@@ -144,7 +204,8 @@ const MazeContainer = ({}) => {
                             visited,
                             c => ({x: c.x + 1, y: c.y}),
                             end,
-                            maze
+                            maze,
+                            seed,
                         )
                         : p;
                     });
@@ -156,6 +217,7 @@ const MazeContainer = ({}) => {
                         end,
                         win,
                         maze,
+                        seed,
                     } = p;
                     return !win && !maze[current.x][current.y].wallWest
                         ? updateProgress(
@@ -164,6 +226,7 @@ const MazeContainer = ({}) => {
                             c => ({x: c.x, y: c.y - 1}),
                             end,
                             maze,
+                            seed,
                         )
                         : p;
                     });
@@ -183,8 +246,12 @@ const MazeContainer = ({}) => {
             id="maze-container"
         >
             <Controls
-                newMaze={(width, height, ranSE) => {
-                    const maze = newMaze(width, height, ranSE);
+                seed={game.seed}
+                userSeed={userSeed}
+                setUserSeed={setUserSeed}
+                initialRandomSE={initalRandomSF}
+                newMaze={(width, height, ranSE, newSeed) => {
+                    const maze = newMaze(width, height, ranSE, newSeed);
                     const current = maze.reduce((item, row) => {
                         const found = row.find(c => c.start);
                         return found || item;
@@ -193,6 +260,14 @@ const MazeContainer = ({}) => {
                         const found = row.find(c => c.end);
                         return found || item;
                     }, {});
+                    updateParams(
+                        {
+                            s: newSeed,
+                            r: ranSE,
+                            w: height, // explicitly not width - maze is rotated
+                            h: width, // explicitly not width - maze is rotated
+                        }
+                    );
                     setProgress(
                         {
                             current,
@@ -200,11 +275,16 @@ const MazeContainer = ({}) => {
                             win: false,
                             end,
                             maze,
+                            seed: newSeed,
+                            touchStart: null,
                         }
                     );
                 }}
                 restartMaze={() => {
-                    const maze = game.maze;
+                    const {
+                        maze,
+                        seed,
+                    } = game;
                     const current = maze.reduce((item, row) => {
                         const found = row.find(c => c.start);
                         return found || item;
@@ -220,6 +300,8 @@ const MazeContainer = ({}) => {
                             win: false,
                             end,
                             maze,
+                            seed,
+                            touchStart: null,
                         }
                     );
                 }}

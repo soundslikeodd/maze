@@ -1,4 +1,6 @@
-const getRandom = max => Math.floor(Math.random() * max);
+import seedrandom from 'seedrandom';
+
+const getRandom = (max, random) => Math.floor(random() * max);
 const defaultMazeHeight = 10;
 const defaultMazeWidth = 10;
 
@@ -24,11 +26,12 @@ const generateEdges = (width, height) => Array(width).fill(Array(height).fill())
 const determinePoint = (
     d1,
     d2,
+    random,
 ) => {
-    const x = getRandom(d1);
+    const x = getRandom(d1, random);
     const y = x === 0 || x === d1 - 1
-        ? getRandom(d2)
-        : getRandom(d1) % 2 === 0 ? 0 : d1 - 1;
+        ? getRandom(d2, random)
+        : getRandom(d1, random) % 2 === 0 ? 0 : d1 - 1;
     return {
         x,
         y
@@ -40,17 +43,18 @@ const determinePointNotSame = (
     d2,
     otherX,
     otherY,
+    random,
 ) => {
     const {
         x,
         y,
-    } = determinePoint(d1, d2);
+    } = determinePoint(d1, d2, random);
     return otherX === x && otherY === y
-        ? determinePointNotSame(d1, d2, otherX, otherY)
+        ? determinePointNotSame(d1, d2, otherX, otherY, random)
         : {x, y};
 };
 
-const determineStartFinish = (maze, ranSE) => {
+const determineStartFinish = (maze, ranSE, random) => {
     const mazeIndexWidth = maze[0].length - 1;
     const mazeIndexHeight = maze.length - 1;
     const [
@@ -65,8 +69,8 @@ const determineStartFinish = (maze, ranSE) => {
         ? (() => {
             const d1 = maze.length;
             const d2 = maze[0].length;
-            const start = determinePoint(d1, d2);
-            const end = determinePointNotSame(d1, d2, start.x, start.y);
+            const start = determinePoint(d1, d2, random);
+            const end = determinePointNotSame(d1, d2, start.x, start.y, random);
             return [start, end];
         })()
         : [{x: 0, y: 0}, {x: mazeIndexHeight, y: mazeIndexWidth}];
@@ -98,11 +102,11 @@ const directionalChecks = (wall, mazeIndexWidth, mazeIndexHeight) => ({
         : !visited.filter(c => c.y === cell.y - 1 && c.x === cell.x).length,
 })[wall];
 
-const pickDirection = (cell, visited, mazeIndexWidth, mazeIndexHeight) => {
+const pickDirection = (cell, visited, mazeIndexWidth, mazeIndexHeight, random) => {
     const cellWalls = wallKeys.reduce((acc, k) => [...acc, ...(cell[k] ? [k] : [])], []);
     const possibleDirections = cellWalls
         .filter(w => directionalChecks(w, mazeIndexWidth, mazeIndexHeight)(cell, visited));
-    return possibleDirections[Math.floor(Math.random() * possibleDirections.length)];
+    return possibleDirections[Math.floor(random() * possibleDirections.length)];
 };
 
 const relativeCell = (cell, direction) => ({
@@ -124,7 +128,8 @@ const walkMaze = (
     maze,
     current,
     end,
-    visited
+    visited,
+    random
 ) => {
         const atEnd = cellsEqual(current, end);
         const mazeIndexWidth = maze[0].length - 1;
@@ -133,13 +138,14 @@ const walkMaze = (
             maze[current.x][current.y],
             visited,
             mazeIndexWidth,
-            mazeIndexHeight
+            mazeIndexHeight,
+            random
         );
         if (!direction || atEnd) {
             const indexOfCurrent = visited.findIndex(v => cellsEqual(v, current)) || 0;
             if (indexOfCurrent) {
                 const last = visited[indexOfCurrent - 1];
-                return walkMaze(maze, maze[last.x][last.y], end, visited);
+                return walkMaze(maze, maze[last.x][last.y], end, visited, random);
             } else {
                 return maze;
             }
@@ -155,13 +161,15 @@ const walkMaze = (
         )));
         const updatedVisited = [...visited, next];
         if (updatedVisited.length < maze.length * maze[0].length) {
-            return walkMaze(adjustedMaze, next, end, updatedVisited);
+            return walkMaze(adjustedMaze, next, end, updatedVisited, random);
         } else {
             return adjustedMaze;
         }
 }
 
-const generateMaze = maze => {
+const generateMaze = (seed, width, height, ranSE) => {
+    const random = seedrandom(seed);
+    const maze = determineStartFinish(generateEdges(width, height), ranSE, random);
     const startX = maze.findIndex(row => row.findIndex(cell => cell.start) >= 0);
     const startY = maze[startX].findIndex(cell => cell.start);
     const endX = maze.findIndex(row => row.findIndex(cell => cell.end) >= 0);
@@ -170,7 +178,8 @@ const generateMaze = maze => {
         maze,
         {x: startX, y: startY},
         {x: endX, y: endY},
-        [{x: startX, y: startY}]
+        [{x: startX, y: startY}],
+        random
     )
     return mazifiedMaze;
 };
