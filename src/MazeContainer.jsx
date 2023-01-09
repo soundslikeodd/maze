@@ -84,6 +84,7 @@ const MazeContainer = (
             end,
             maze: initialMaze,
             seed: initialSeed,
+            interactions: 0,
             touchStart: null
         };
     });
@@ -108,13 +109,14 @@ const MazeContainer = (
                         current,
                         win,
                         maze,
+                        interactions,
                     } = p;
                     return !win && !maze[current.x][current.y].wallNorth
                         ? updateProgress(
-                            p,
+                            {...p, interactions: interactions + 1},
                             c => ({x: c.x - 1, y: c.y})
                         )
-                        : p;
+                        : {...p, interactions: interactions + 1};
                 });
             } else if (event.key === 'ArrowRight' || swipeDirection === 'right') {
                 setProgress(p => {
@@ -122,13 +124,14 @@ const MazeContainer = (
                         current,
                         win,
                         maze,
+                        interactions,
                     } = p;
                     return !win && !maze[current.x][current.y].wallEast
                         ? updateProgress(
-                            p,
+                            {...p, interactions: interactions + 1},
                             c => ({x: c.x, y: c.y + 1})
                         )
-                        : p;
+                        : {...p, interactions: interactions + 1};
                 });
             } else if (event.key === 'ArrowDown' || swipeDirection === 'down') {
                 setProgress(p => {
@@ -136,13 +139,14 @@ const MazeContainer = (
                         current,
                         win,
                         maze,
+                        interactions,
                     } = p;
                     return !win && !maze[current.x][current.y].wallSouth
                         ? updateProgress(
-                            p,
+                            {...p, interactions: interactions + 1},
                             c => ({x: c.x + 1, y: c.y})
                         )
-                        : p;
+                        : {...p, interactions: interactions + 1};
                     });
             } else if (event.key === 'ArrowLeft' || swipeDirection === 'left') {
                 setProgress(p => {
@@ -150,13 +154,14 @@ const MazeContainer = (
                         current,
                         win,
                         maze,
+                        interactions,
                     } = p;
                     return !win && !maze[current.x][current.y].wallWest
                         ? updateProgress(
-                            p,
+                            {...p, interactions: interactions + 1},
                             c => ({x: c.x, y: c.y - 1})
                         )
-                        : p;
+                        : {...p, interactions: interactions + 1};
                     });
             }
         };
@@ -209,6 +214,7 @@ const MazeContainer = (
                             touchStart: null,
                             width,
                             height,
+                            interactions: 0,
                         }
                     );
                 }}
@@ -238,12 +244,14 @@ const MazeContainer = (
                             touchStart: null,
                             width,
                             height,
+                            interactions: 0,
                         }
                     );
                 }}
             />
             <Status
                 moves={game.visited.length - 1}
+                wallHits={game.interactions - (game.visited.length - 1)}
                 win={game.win}
             />
             <Maze

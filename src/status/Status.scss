@@ -4,7 +4,22 @@
   flex-direction: row;
   gap: 5px;
 
-  #winning {
-    background-color: #B3CCF5;
+  div {
+    &#winning {
+      background-color: #B3CCF5;
+    }
+
+    &.hit {
+      animation: backgrondColorFadeOut 0.5s; 
+    }
   }
+}
+
+@keyframes backgrondColorFadeOut {
+	0% {
+		background: #ee6055;
+	}
+	100% {
+		background: white;
+	}
 }

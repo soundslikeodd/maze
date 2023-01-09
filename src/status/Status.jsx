@@ -2,6 +2,7 @@ import './Status.scss';
 
 const Status = ({
     moves,
+    wallHits,
     win,
 }) => (
     <div
@@ -16,7 +17,13 @@ const Status = ({
             {win && 'in'}
         </div>
         <div>
-            {moves} Moves
+            {moves} Moves,
+        </div>
+        <div
+            key={wallHits}
+            className={wallHits > 0 ? 'hit' : ''}
+        >
+            {wallHits} Wall Hits
         </div>
     </div>
 );
