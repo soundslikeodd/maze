@@ -1,16 +1,19 @@
 import { useState } from 'react';
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid } from 'uuid';import seedrandom from 'seedrandom';
 import './Controls.scss';
 
 const settingsString = (
     {
-        size,
+        height,
+        width,
         randomSE,
         seed,
     }
 ) => (
     <p>
-        {size.split(',').join('x')}
+        {height}
+        x
+        {width}
         <br />
         Random Start/Finish: {`${randomSE}`}
         <br />
@@ -30,6 +33,8 @@ const sizes = {
 const Controls = ({
     newMaze,
     restartMaze,
+    width,
+    height,
     seed,
     userSeed,
     setUserSeed,
@@ -39,7 +44,8 @@ const Controls = ({
     const [size, setSize] = useState(SMALL);
     const [currentSettings, setCurrentSettings] = useState(
         settingsString({
-            size,
+            width,
+            height,
             randomSE: initialRandomSE,
             seed,
         })
@@ -117,16 +123,18 @@ const Controls = ({
                         >
                             <button
                                 onClick={() => {
+                                    const random = seedrandom(uuid());
                                     const [
                                         height,
                                         width,
-                                    ] = size.split(',').map(s => Number(s));
+                                    ] = size.split(',').map(s => +s);
                                     const seedToUse = userSeed && userSeed !== ''
                                         ? userSeed
                                         : uuid();
                                     setCurrentSettings(
                                         settingsString({
-                                            size,
+                                            height,
+                                            width,
                                             randomSE,
                                             seed: seedToUse
                                         })

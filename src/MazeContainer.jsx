@@ -58,7 +58,7 @@ const initialConfig = queryStringToObj(history.location.search.replace('?', ''))
 const initialSeed = initialConfig?.s || uuid();
 const validatedWidth = [10, 15].includes(+initialConfig?.w) ? +initialConfig.w : defaultMazeWidth;
 const validatedHeight = [10, 15].includes(+initialConfig?.h) ? +initialConfig.h : defaultMazeHeight;
-const initalRandomSF = initialConfig?.r === 'true' ? true : false;
+const initalRandomSF = initialConfig?.r === 'true';
 const initialMaze = newMaze(
     validatedHeight, // explicitly set to height - maze is roteated
     validatedWidth, // explicitly set to weight - maze is roteated
@@ -74,7 +74,16 @@ updateParams(
     }
 );
 
-const updateProgress = (current, visited, nextCellFunc, end, maze, seed) => {
+const updateProgress = (
+    current,
+    visited,
+    nextCellFunc,
+    end,
+    maze,
+    seed,
+    width,
+    height
+) => {
     const nextCell = nextCellFunc(current);
     return {
         current: nextCell,
@@ -82,6 +91,8 @@ const updateProgress = (current, visited, nextCellFunc, end, maze, seed) => {
         win: cellsEqual(nextCell, end),
         end,
         maze,
+        width,
+        height,
         seed,
         touchStart: null,
     };
@@ -121,8 +132,12 @@ const MazeContainer = ({}) => {
             const found = row.find(c => c.end);
             return found || item;
         }, {});
+        const width = initialMaze.length;
+        const height = initialMaze[0].length;
         return {
             current,
+            width,
+            height,
             visited: [current],
             win: false,
             end,
@@ -155,6 +170,8 @@ const MazeContainer = ({}) => {
                         win,
                         maze,
                         seed,
+                        width,
+                        height,
                     } = p;
                     return !win && !maze[current.x][current.y].wallNorth
                         ? updateProgress(
@@ -164,6 +181,8 @@ const MazeContainer = ({}) => {
                             end,
                             maze,
                             seed,
+                            width,
+                            height
                         )
                         : p;
                 });
@@ -176,6 +195,8 @@ const MazeContainer = ({}) => {
                         win,
                         maze,
                         seed,
+                        width,
+                        height,
                     } = p;
                     return !win && !maze[current.x][current.y].wallEast
                         ? updateProgress(
@@ -185,6 +206,8 @@ const MazeContainer = ({}) => {
                             end,
                             maze,
                             seed,
+                            width,
+                            height
                         )
                         : p;
                 });
@@ -197,6 +220,8 @@ const MazeContainer = ({}) => {
                         win,
                         maze,
                         seed,
+                        width,
+                        height,
                     } = p;
                     return !win && !maze[current.x][current.y].wallSouth
                         ? updateProgress(
@@ -206,6 +231,8 @@ const MazeContainer = ({}) => {
                             end,
                             maze,
                             seed,
+                            width,
+                            height
                         )
                         : p;
                     });
@@ -218,6 +245,8 @@ const MazeContainer = ({}) => {
                         win,
                         maze,
                         seed,
+                        width,
+                        height,
                     } = p;
                     return !win && !maze[current.x][current.y].wallWest
                         ? updateProgress(
@@ -227,6 +256,8 @@ const MazeContainer = ({}) => {
                             end,
                             maze,
                             seed,
+                            width,
+                            height
                         )
                         : p;
                     });
@@ -249,6 +280,8 @@ const MazeContainer = ({}) => {
                 seed={game.seed}
                 userSeed={userSeed}
                 setUserSeed={setUserSeed}
+                width={game.width}
+                height={game.height}
                 initialRandomSE={initalRandomSF}
                 newMaze={(width, height, ranSE, newSeed) => {
                     const maze = newMaze(width, height, ranSE, newSeed);
@@ -264,7 +297,7 @@ const MazeContainer = ({}) => {
                         {
                             s: newSeed,
                             r: ranSE,
-                            w: height, // explicitly not width - maze is rotated
+                            w: height, // explicitly not height - maze is rotated
                             h: width, // explicitly not width - maze is rotated
                         }
                     );
@@ -277,6 +310,8 @@ const MazeContainer = ({}) => {
                             maze,
                             seed: newSeed,
                             touchStart: null,
+                            width,
+                            height,
                         }
                     );
                 }}
@@ -293,6 +328,8 @@ const MazeContainer = ({}) => {
                         const found = row.find(c => c.end);
                         return found || item;
                     }, {});
+                    const width = maze.length;
+                    const height = maze[0].length;
                     setProgress(
                         {
                             current,
@@ -302,6 +339,8 @@ const MazeContainer = ({}) => {
                             maze,
                             seed,
                             touchStart: null,
+                            width,
+                            height,
                         }
                     );
                 }}

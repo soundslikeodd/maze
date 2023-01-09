@@ -29,9 +29,9 @@ const determinePoint = (
     random,
 ) => {
     const x = getRandom(d1, random);
-    const y = x === 0 || x === d1 - 1
+    const y = x === 0 || x === d1
         ? getRandom(d2, random)
-        : getRandom(d1, random) % 2 === 0 ? 0 : d1 - 1;
+        : getRandom(d1, random) % 2 === 0 ? 0 : d2; // keeps points are edge of maze
     return {
         x,
         y
@@ -67,8 +67,8 @@ const determineStartFinish = (maze, ranSE, random) => {
         }
     ] = ranSE
         ? (() => {
-            const d1 = maze.length;
-            const d2 = maze[0].length;
+            const d1 = maze.length - 1;
+            const d2 = maze[0].length - 1;
             const start = determinePoint(d1, d2, random);
             const end = determinePointNotSame(d1, d2, start.x, start.y, random);
             return [start, end];
@@ -170,7 +170,9 @@ const walkMaze = (
 const generateMaze = (seed, width, height, ranSE) => {
     const random = seedrandom(seed);
     const maze = determineStartFinish(generateEdges(width, height), ranSE, random);
-    const startX = maze.findIndex(row => row.findIndex(cell => cell.start) >= 0);
+    const startX = maze.findIndex(row => {
+        return row.findIndex(cell => cell.start) >= 0;
+    });
     const startY = maze[startX].findIndex(cell => cell.start);
     const endX = maze.findIndex(row => row.findIndex(cell => cell.end) >= 0);
     const endY = maze[endX].findIndex(cell => cell.end);
