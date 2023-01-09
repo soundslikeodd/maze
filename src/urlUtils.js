@@ -6,11 +6,11 @@ export const queryStringAsObj = () => {
     const qStr = history.location.search.replace('?', '');
     if (qStr.length < 1) return {};
     const qSplit = qStr.includes('&') ? qStr.split('&') : [qStr];
-    return qSplit.reduce((acc, i) => ({ ...acc, [i.split('=')[0]]: i.split('=')[1] }), {});
+    return qSplit.reduce((acc, i) => ({...acc, [i.split('=')[0]]: decodeURIComponent(i.split('=')[1])}), {});
 };
 const objToQueryString = props => Object.keys(props)
     .reduce(
-        (acc, i) => `${acc.length < 1 ? '' : `${acc}&`}${i}=${props[i]}`,
+        (acc, i) => `${acc.length < 1 ? '' : `${acc}&`}${i}=${encodeURIComponent(props[i])}`,
         ''
     );
 export const updateParams = paramMap => {

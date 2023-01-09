@@ -40,7 +40,7 @@ const Controls = ({
     setUserSeed,
     initialRandomSE
 }) => {
-    const [randomSE, setRandomSE] = useState(false);
+    const [randomSE, setRandomSE] = useState(initialRandomSE);
     const [size, setSize] = useState(SMALL);
     const [currentSettings, setCurrentSettings] = useState(
         settingsString({
