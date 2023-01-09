@@ -7,7 +7,7 @@ import Controls from './controls/Controls';
 import Status from './status/Status';
 import {
     generateMaze,
-    cellsEqual,
+    cellsEqual
 } from './generation/generator';
 import {
     updateParams
@@ -15,25 +15,20 @@ import {
 import './MazeContainer.scss';
 
 const updateProgress = (
-    current,
-    visited,
-    nextCellFunc,
-    end,
-    maze,
-    seed,
-    width,
-    height
+    progress,
+    nextCellFunc
 ) => {
+    const {
+        current,
+        visited,
+        end,
+    } = progress;
     const nextCell = nextCellFunc(current);
     return {
+        ...progress,
         current: nextCell,
         visited: [...visited, nextCell],
         win: cellsEqual(nextCell, end),
-        end,
-        maze,
-        width,
-        height,
-        seed,
         touchStart: null,
     };
 };
@@ -111,24 +106,13 @@ const MazeContainer = (
                 setProgress(p => {
                     const {
                         current,
-                        visited,
-                        end,
                         win,
                         maze,
-                        seed,
-                        width,
-                        height,
                     } = p;
                     return !win && !maze[current.x][current.y].wallNorth
                         ? updateProgress(
-                            current,
-                            visited,
-                            c => ({x: c.x - 1, y: c.y}),
-                            end,
-                            maze,
-                            seed,
-                            width,
-                            height
+                            p,
+                            c => ({x: c.x - 1, y: c.y})
                         )
                         : p;
                 });
@@ -136,24 +120,13 @@ const MazeContainer = (
                 setProgress(p => {
                     const {
                         current,
-                        visited,
-                        end,
                         win,
                         maze,
-                        seed,
-                        width,
-                        height,
                     } = p;
                     return !win && !maze[current.x][current.y].wallEast
                         ? updateProgress(
-                            current,
-                            visited,
-                            c => ({x: c.x, y: c.y + 1}),
-                            end,
-                            maze,
-                            seed,
-                            width,
-                            height
+                            p,
+                            c => ({x: c.x, y: c.y + 1})
                         )
                         : p;
                 });
@@ -161,24 +134,13 @@ const MazeContainer = (
                 setProgress(p => {
                     const {
                         current,
-                        visited,
-                        end,
                         win,
                         maze,
-                        seed,
-                        width,
-                        height,
                     } = p;
                     return !win && !maze[current.x][current.y].wallSouth
                         ? updateProgress(
-                            current,
-                            visited,
-                            c => ({x: c.x + 1, y: c.y}),
-                            end,
-                            maze,
-                            seed,
-                            width,
-                            height
+                            p,
+                            c => ({x: c.x + 1, y: c.y})
                         )
                         : p;
                     });
@@ -186,24 +148,13 @@ const MazeContainer = (
                 setProgress(p => {
                     const {
                         current,
-                        visited,
-                        end,
                         win,
                         maze,
-                        seed,
-                        width,
-                        height,
                     } = p;
                     return !win && !maze[current.x][current.y].wallWest
                         ? updateProgress(
-                            current,
-                            visited,
-                            c => ({x: c.x, y: c.y - 1}),
-                            end,
-                            maze,
-                            seed,
-                            width,
-                            height
+                            p,
+                            c => ({x: c.x, y: c.y - 1})
                         )
                         : p;
                     });

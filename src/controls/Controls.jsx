@@ -29,6 +29,11 @@ const sizes = {
     medium: MEDIUM,
     large: LARGE,
 };
+const determineSize = (height, width) => width === 10
+    ? height === 10
+        ? 'small'
+        : 'medium'
+    : 'large';
 
 const Controls = ({
     newMaze,
@@ -41,7 +46,7 @@ const Controls = ({
     initialRandomSE
 }) => {
     const [randomSE, setRandomSE] = useState(initialRandomSE);
-    const [size, setSize] = useState(SMALL);
+    const [size, setSize] = useState(sizes[determineSize(width, height)]); // width/height swapped on purpose
     const [currentSettings, setCurrentSettings] = useState(
         settingsString({
             width,
