@@ -1,78 +1,18 @@
-import { createBrowserHistory } from 'history';
 import {
     useState,
     useEffect
 } from 'react';
-import { v4 as uuid } from 'uuid';
 import Maze from './maze/Maze';
 import Controls from './controls/Controls';
 import Status from './status/Status';
 import {
     generateMaze,
     cellsEqual,
-    defaultMazeHeight,
-    defaultMazeWidth
 } from './generation/generator';
+import {
+    updateParams
+} from './urlUtils';
 import './MazeContainer.scss';
-
-const history = createBrowserHistory();
-const queryStringToObj = qStr => {
-    if (qStr.length < 1) return {};
-    const qSplit = qStr.includes('&') ? qStr.split('&') : [qStr];
-    return qSplit.reduce((acc, i) => ({ ...acc, [i.split('=')[0]]: i.split('=')[1] }), {});
-};
-const objToQueryString = props => Object.keys(props)
-    .reduce(
-        (acc, i) => `${acc.length < 1 ? '' : `${acc}&`}${i}=${props[i]}`,
-        ''
-    );
-const updateParams = paramMap => {
-    history.replace({
-        pathname: history.location.pathname,
-        search: objToQueryString(
-            {
-                ...queryStringToObj(history.location.search.replace('?', '')),
-                ...paramMap,
-            }
-        ),
-    });
-};
-
-const newMaze = (
-    width,
-    height,
-    ranSE,
-    seed
-) => generateMaze(seed, width, height, ranSE);
-
-/**
- * initialConfig shape
- * {
- *  s: seed,
- *  w: width,
- *  h: height,
- *  r: random start and finish points
- * }
- */
-const initialConfig = queryStringToObj(history.location.search.replace('?', ''));
-const initialSeed = initialConfig?.s || uuid();
-const validatedWidth = [10, 15].includes(+initialConfig?.w) ? +initialConfig.w : defaultMazeWidth;
-const validatedHeight = [10, 15].includes(+initialConfig?.h) ? +initialConfig.h : defaultMazeHeight;
-const initalRandomSF = initialConfig?.r === 'true';
-const initialMaze = newMaze(
-    validatedHeight, // explicitly set to height - maze is roteated
-    validatedWidth, // explicitly set to weight - maze is roteated
-    initalRandomSF,
-    initialSeed
-);
-updateParams(
-    {
-        s: initialSeed,
-        r: initalRandomSF,
-        w: validatedWidth,
-        h: validatedHeight,
-    }
-);
 
 const updateProgress = (
     current,
@@ -120,7 +60,13 @@ const determineTouchDirection = (
             : 'up';
 }
 
-const MazeContainer = ({}) => {
+const MazeContainer = (
+    {
+        initialMaze,
+        initialSeed,
+        initalRandomSF,
+    }
+) => {
     const [touchStart, setTouchStart] = useState();
     const [userSeed, setUserSeed] = useState('');
     const [game, setProgress] = useState(() => {
@@ -284,7 +230,7 @@ const MazeContainer = ({}) => {
                 height={game.height}
                 initialRandomSE={initalRandomSF}
                 newMaze={(width, height, ranSE, newSeed) => {
-                    const maze = newMaze(width, height, ranSE, newSeed);
+                    const maze = generateMaze(newSeed, width, height, ranSE);
                     const current = maze.reduce((item, row) => {
                         const found = row.find(c => c.start);
                         return found || item;

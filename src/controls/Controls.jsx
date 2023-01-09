@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { v4 as uuid } from 'uuid';import seedrandom from 'seedrandom';
+import { v4 as uuid } from 'uuid';
 import './Controls.scss';
 
 const settingsString = (
@@ -67,12 +67,12 @@ const Controls = ({
                         <div
                             className="text-container"
                         >
-                            <label htmlFor="seed-text-input">Seed:</label>
                             <input
                                 id="seed-text-input"
                                 type="text"
                                 onChange={e => setUserSeed(e.target.value)}
                                 value={userSeed}
+                                placeholder="enter seed"
                             />
                         </div>
                         <div
@@ -117,19 +117,20 @@ const Controls = ({
                             className="instructions"
                         >
                             navigate with arrow keys or swipe
+                            <br />
+                            URL is shareable 📩
                         </div>
                         <div
                             className="controls-row buttons-container"
                         >
                             <button
                                 onClick={() => {
-                                    const random = seedrandom(uuid());
                                     const [
                                         height,
                                         width,
                                     ] = size.split(',').map(s => +s);
                                     const seedToUse = userSeed && userSeed !== ''
-                                        ? userSeed
+                                        ? userSeed.trim()
                                         : uuid();
                                     setCurrentSettings(
                                         settingsString({
