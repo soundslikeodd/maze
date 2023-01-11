@@ -36,6 +36,7 @@ const determineSize = (height, width) => width === 10
     : 'large';
 
 const Controls = ({
+    elementRef,
     newMaze,
     restartMaze,
     width,
@@ -58,6 +59,7 @@ const Controls = ({
     return (
         <fieldset
             id="controls"
+            ref={elementRef}
         >
             <legend>Controls:</legend>
             <div

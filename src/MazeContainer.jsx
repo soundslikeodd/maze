@@ -1,6 +1,7 @@
 import {
     useState,
-    useEffect
+    useEffect,
+    useRef
 } from 'react';
 import Maze from './maze/Maze';
 import Controls from './controls/Controls';
@@ -45,15 +46,33 @@ const determineTouchDirection = (
 ) => {
     const deltaX = startX - endX;
     const deltaY = startY - endY;
-    const isHorizantol = Math.abs(deltaX) > Math.abs(deltaY);
-    return isHorizantol 
-        ? deltaX < 0
-            ? 'right'
-            : 'left'
-        : deltaY < 0
-            ? 'down'
-            : 'up';
-}
+    const absDeltaX = Math.abs(deltaX);
+    const absDeltaY = Math.abs(deltaY);
+    return (absDeltaX < 1 && absDeltaY < 1)
+        ? null
+        : absDeltaX > absDeltaY 
+            ? deltaX < 0
+                ? 'right'
+                : 'left'
+            : deltaY < 0
+                ? 'down'
+                : 'up';
+};
+
+const takeTurn = (wall, moveFunc, updateFunc) => updateFunc(p => {
+    const {
+        current,
+        win,
+        maze,
+        interactions,
+    } = p;
+    return !win && !maze[current.x][current.y][wall]
+        ? updateProgress(
+            {...p, interactions: interactions + 1},
+            moveFunc
+        )
+        : {...p, interactions: interactions + 1};
+});
 
 const MazeContainer = (
     {
@@ -62,6 +81,7 @@ const MazeContainer = (
         initalRandomSF,
     }
 ) => {
+    const controlsRef = useRef(null);
     const [touchStart, setTouchStart] = useState();
     const [userSeed, setUserSeed] = useState('');
     const [game, setProgress] = useState(() => {
@@ -90,79 +110,27 @@ const MazeContainer = (
     });
     useEffect(() => {
         const keyPress = (event) => {
-            if (event.type === 'touchstart') {
-                setTouchStart({
+            const swipeDirection = event.type === 'touchstart' && !controlsRef.current.contains(event.target)
+                ? setTouchStart({ // set state return undefined as direction
                     x: event.changedTouches[0].screenX,
                     y: event.changedTouches[0].screenY,
-                });
-            }
-            const swipeDirection = event.type === 'touchend'
-                ? determineTouchDirection(
-                    touchStart, {
-                        x: event.changedTouches[0].screenX,
-                        y: event.changedTouches[0].screenY,
-                    })
-                : null;
-            if (event.key === 'ArrowUp' || swipeDirection === 'up') {
-                setProgress(p => {
-                    const {
-                        current,
-                        win,
-                        maze,
-                        interactions,
-                    } = p;
-                    return !win && !maze[current.x][current.y].wallNorth
-                        ? updateProgress(
-                            {...p, interactions: interactions + 1},
-                            c => ({x: c.x - 1, y: c.y})
-                        )
-                        : {...p, interactions: interactions + 1};
-                });
-            } else if (event.key === 'ArrowRight' || swipeDirection === 'right') {
-                setProgress(p => {
-                    const {
-                        current,
-                        win,
-                        maze,
-                        interactions,
-                    } = p;
-                    return !win && !maze[current.x][current.y].wallEast
-                        ? updateProgress(
-                            {...p, interactions: interactions + 1},
-                            c => ({x: c.x, y: c.y + 1})
-                        )
-                        : {...p, interactions: interactions + 1};
-                });
-            } else if (event.key === 'ArrowDown' || swipeDirection === 'down') {
-                setProgress(p => {
-                    const {
-                        current,
-                        win,
-                        maze,
-                        interactions,
-                    } = p;
-                    return !win && !maze[current.x][current.y].wallSouth
-                        ? updateProgress(
-                            {...p, interactions: interactions + 1},
-                            c => ({x: c.x + 1, y: c.y})
-                        )
-                        : {...p, interactions: interactions + 1};
-                    });
-            } else if (event.key === 'ArrowLeft' || swipeDirection === 'left') {
-                setProgress(p => {
-                    const {
-                        current,
-                        win,
-                        maze,
-                        interactions,
-                    } = p;
-                    return !win && !maze[current.x][current.y].wallWest
-                        ? updateProgress(
-                            {...p, interactions: interactions + 1},
-                            c => ({x: c.x, y: c.y - 1})
-                        )
-                        : {...p, interactions: interactions + 1};
-                    });
+                })
+                : touchStart && event.type === 'touchend'
+                    ? determineTouchDirection( // return direction of swipe
+                        touchStart, {
+                            x: event.changedTouches[0].screenX,
+                            y: event.changedTouches[0].screenY,
+                        }
+                    )
+                    : setTouchStart(null); // set tcouh start to null and return undefined as direction
+            if (event.key === 'ArrowUp' || event.key === 'w' || swipeDirection === 'up') {
+                takeTurn('wallNorth', c => ({x: c.x - 1, y: c.y}), setProgress);
+            } else if (event.key === 'ArrowRight' || event.key === 'd' || swipeDirection === 'right') {
+                takeTurn('wallEast', c => ({x: c.x, y: c.y + 1}), setProgress);
+            } else if (event.key === 'ArrowDown' || event.key === 's' || swipeDirection === 'down') {
+                takeTurn('wallSouth', c => ({x: c.x + 1, y: c.y}), setProgress);
+            } else if (event.key === 'ArrowLeft' || event.key === 'a' || swipeDirection === 'left') {
+                takeTurn('wallWest', c => ({x: c.x, y: c.y - 1}), setProgress);
             }
         };
         document.addEventListener("keydown", keyPress);
@@ -179,6 +147,7 @@ const MazeContainer = (
             id="maze-container"
         >
             <Controls
+                elementRef={controlsRef}
                 seed={game.seed}
                 userSeed={userSeed}
                 setUserSeed={setUserSeed}

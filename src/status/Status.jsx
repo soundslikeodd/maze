@@ -17,13 +17,13 @@ const Status = ({
             {win && 'in'}
         </div>
         <div>
-            {moves} Moves,
+            {moves} Move{moves !== 1 && 's'},
         </div>
         <div
             key={wallHits}
             className={wallHits > 0 ? 'hit' : ''}
         >
-            {wallHits} Wall Hits
+            {wallHits} Wall Hit{wallHits !== 1 && 's'}
         </div>
     </div>
 );
