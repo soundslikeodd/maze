@@ -1,31 +1,45 @@
+// import Timer from './Timer';
 import './Status.scss';
 
 const Status = ({
-    moves,
-    wallHits,
-    win,
+  moves,
+  wallHits,
+  win,
 }) => (
+  <div
+    id="game-status"
+  >
     <div
-        id="game-status"
+      id="winning"
     >
-        <div 
-            id="winning"
-        >
-            {win && 'You Won'}
-        </div>
-        <div>
-            {win && 'in'}
-        </div>
-        <div>
-            {moves} Move{moves !== 1 && 's'},
-        </div>
-        <div
-            key={wallHits}
-            className={wallHits > 0 ? 'hit' : ''}
-        >
-            {wallHits} Wall Hit{wallHits !== 1 && 's'}
-        </div>
+      {win && 'You Won'}
     </div>
+    <div>
+      {win && 'in'}
+    </div>
+    <div>
+      {moves}
+      {' '}
+      Move
+      {moves !== 1 && 's'}
+      ,
+    </div>
+    <div
+      key={wallHits}
+      className={wallHits > 0 ? 'hit' : ''}
+    >
+      {wallHits}
+      {' '}
+      Wall Hit
+      {wallHits !== 1 && 's'}
+    </div>
+    <div>
+      {win && 'in'}
+    </div>
+    {/* <Timer
+      started={!!(moves > 0 && !win)}
+    /> */}
+  </div>
 );
 
 export default Status;
