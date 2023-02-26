@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "clean": "rm -rf dist && rm -rf node_modules",
-    "start": "npm install && npm lint && webpack serve --config webpack.config.js",
+    "start": "npm install && npm run lint && webpack serve --config webpack.config.js",
     "lint": "eslint  --format=pretty --ext .jsx --ext .js .",
     "build": "webpack --mode production",
     "gh-pages": "npm run setup && npm run build && gh-pages -d dist -b gh-pages"
