@@ -1,0 +1,4 @@
+{
+    "*.{js,jsx}": "eslint --format=pretty --fix",
+    "*.{css,scss}": "stylelint --fix"
+}

@@ -11,15 +11,16 @@
     }
 
     &.hit {
-      animation: backgrondColorFadeOut 0.5s; 
+      animation: backgrond-color-fade-out 0.5s; 
     }
   }
 }
 
-@keyframes backgrondColorFadeOut {
+@keyframes backgrond-color-fade-out {
 	0% {
 		background: #ee6055;
 	}
+
 	100% {
 		background: white;
 	}
