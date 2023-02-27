@@ -71,7 +71,9 @@ const takeTurn = (wall, moveFunc, updateFunc) => updateFunc((p) => {
       { ...p, interactions: interactions + 1 },
       moveFunc,
     )
-    : { ...p, interactions: interactions + 1 };
+    : win
+      ? p
+      : { ...p, interactions: interactions + 1 };
 });
 
 const MazeContainer = (

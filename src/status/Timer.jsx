@@ -1,43 +1,65 @@
 import {
   useState,
   useEffect,
-  useMemo,
 } from 'react';
 
-const Timer = ({ started }) => {
-  const [deadline, setDeadLine] = useState(null);
-  const parsedDeadline = useMemo(() => Date.parse(deadline), [deadline]);
-  const [time, setTime] = useState(parsedDeadline - Date.now());
-  const [timerInterval, setTimerInterval] = useState(null);
+const Timer = ({ started, reset }) => {
+  const [timerState, setTimerState] = useState(
+    {
+      deadline: null,
+      time: null,
+      timerInterval: null,
+    },
+  );
   useEffect(() => {
-    // console.log('effect', !!(started && !timerInterval), !!(!started && timerInterval));
-    const returnInterval = started && !timerInterval
+    const returnInterval = started && !timerState.timerInterval
       ? (() => {
-        setDeadLine(new Date().toString());
+        // setup interval
         const interval = setInterval(
           () => {
-            // console.log('interval ', Date.now() - parsedDeadline);
-            setTime(Date.now() - parsedDeadline);
+            setTimerState((prevState) => ( // each iteration is an update to previous state
+              {
+                deadline: prevState.deadline,
+                time: Date.now() - Date.parse(prevState.deadline),
+                timerInterval: prevState.timerInterval,
+              }
+            ));
           },
-          1000,
+          500,
         );
-        setTimerInterval(interval);
+        // setup initial timer state
+        setTimerState(
+          {
+            deadline: new Date().toString(),
+            time: null,
+            timerInterval: interval,
+          },
+        );
         return interval;
       })()
-      : !started && timerInterval
+      : !started && timerState.timerInterval
         ? (() => {
-          clearInterval(timerInterval);
-          setTimerInterval(null);
+          clearInterval(timerState.timerInterval);
+          setTimerState(
+            {
+              deadline: timerState.deadline,
+              time: timerState.time,
+              timerInterval: null,
+            },
+          );
         })()
         : null;
-    return () => clearInterval(returnInterval || timerInterval);
-  }, [started, timerInterval]);
-  // console.log('time', time, parsedDeadline);
+    return () => clearInterval(returnInterval || timerState.timerInterval);
+  }, [started]);
+  const {
+    time,
+  } = timerState;
+  const timeToUse = reset ? null : time;
   return (
     <div className="timer">
-      {`${time > 0 ? Math.floor((time / (1000 * 60)) % 60) : 0}`.padStart(2, '0')}
+      {`${timeToUse > 0 ? Math.floor((time / (1000 * 60)) % 60) : 0}`.padStart(2, '0')}
       :
-      {`${time > 0 ? Math.floor((time / 1000) % 60) : 0}`.padStart(2, '0')}
+      {`${timeToUse > 0 ? Math.floor((time / 1000) % 60) : 0}`.padStart(2, '0')}
     </div>
   );
 };

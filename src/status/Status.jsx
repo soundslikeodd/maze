@@ -1,4 +1,4 @@
-// import Timer from './Timer';
+import Timer from './Timer';
 import './Status.scss';
 
 const Status = ({
@@ -36,9 +36,10 @@ const Status = ({
     <div>
       {win && 'in'}
     </div>
-    {/* <Timer
-      started={!!(moves > 0 && !win)}
-    /> */}
+    <Timer
+      started={!!((moves > 0 || wallHits > 0) && !win)}
+      reset={!!(moves === 0 && wallHits === 0)}
+    />
   </div>
 );
 
