@@ -22,11 +22,11 @@ import MazeContainer from './MazeContainer';
  */
 const initialConfig = queryStringAsObj();
 const initialSeed = initialConfig?.s || uuid();
-const validatedWidth = [10, 15].includes(
-  +(initialConfig?.w || 10),
+const validatedWidth = ['10', '15'].includes(
+  initialConfig?.w,
 ) ? +initialConfig.w : defaultMazeWidth;
-const validatedHeight = [10, 15].includes(
-  +(initialConfig?.h || 10),
+const validatedHeight = ['10', '15'].includes(
+  initialConfig?.h,
 ) ? +initialConfig.h : defaultMazeHeight;
 const initalRandomSF = initialConfig?.r === 'true';
 const initialMaze = generateMaze(
