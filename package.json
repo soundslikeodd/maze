@@ -10,7 +10,7 @@
     "lint:es": "eslint  --format=pretty --ext .jsx --ext .js .",
     "lint:style": "stylelint '**/*.scss'",
     "build": "webpack --mode production",
-    "gh-pages": "npm run setup && npm run build && gh-pages -d dist -b gh-pages",
+    "gh-pages": "npm install && npm run build && gh-pages -d dist -b gh-pages",
     "prepare": "husky install"
   },
   "author": "matthew schaadt",
