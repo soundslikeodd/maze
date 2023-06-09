@@ -1,3 +1,5 @@
+import { webPackageBanner } from '@soundslikeodd/package-banner';
+import standard from 'figlet/importable-fonts/Standard'; // eslint-disable-line  import/no-unresolved
 import { createRoot } from 'react-dom/client';
 import { v4 as uuid } from 'uuid';
 import {
@@ -10,6 +12,18 @@ import {
   updateParams,
 } from './urlUtils';
 import MazeContainer from './MazeContainer';
+import packageJson from '../package.json';
+
+webPackageBanner({
+  packageJson,
+  capitalCase: true,
+  figletFontFileData: standard,
+  additionalPackageInfo: [
+    'description',
+    'author',
+    'license',
+  ],
+});
 
 /**
  * initialConfig shape
